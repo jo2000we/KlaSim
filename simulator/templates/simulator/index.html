@@ -17,6 +17,7 @@
                 <span>&#9679; Aktiv</span>
             </div>
         </header>
+
         {% if messages %}
         <ul class="messages">
         {% for message in messages %}
@@ -24,6 +25,7 @@
         {% endfor %}
         </ul>
         {% endif %}
+
         <main>
             <section class="file-upload exam">
                 <h2><span class="icon">&#128196;</span> Klausur hochladen</h2>
@@ -79,28 +81,27 @@
             {% endif %}
         </main>
         <footer>
-            <form action="{% url 'run_simulation' %}" method="post">
+            <form id="runForm" action="{% url 'run_simulation' %}" method="post">
                 {% csrf_token %}
-                <button class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
+                <button id="runBtn" class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
             </form>
         </footer>
     </div>
 
     <script>
-        const actionBtn = document.querySelector('.btn.main-action');
+        const runForm = document.getElementById('runForm');
+        const runBtn = document.getElementById('runBtn');
         const hasExam = {{ exam_files|length }} > 0;
         const hasContext = {{ context_files|length }} > 0;
         if (hasExam && hasContext) {
-            actionBtn.removeAttribute('disabled');
-            actionBtn.removeAttribute('title');
+            runBtn.removeAttribute('disabled');
+            runBtn.removeAttribute('title');
         }
-
-        actionBtn.addEventListener('click', () => {
-            if (actionBtn.disabled) return;
-            actionBtn.setAttribute('disabled', '');
+        runForm?.addEventListener('submit', () => {
+            runBtn.setAttribute('disabled', '');
             const spinner = document.createElement('span');
             spinner.className = 'spinner';
-            actionBtn.appendChild(spinner);
+            runBtn.appendChild(spinner);
         });
     </script>
 </body>
