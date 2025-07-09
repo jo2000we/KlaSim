@@ -117,6 +117,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+# Session cleanup configuration
+SESSION_LIFETIME_DAYS = int(os.environ.get('SESSION_LIFETIME_DAYS', '7'))
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
