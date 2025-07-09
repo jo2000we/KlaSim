@@ -1,1 +1,84 @@
-<h1>Simulator Index</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Klausur-Simulator</title>
+    <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Klausur-Simulator</h1>
+            <div class="session-badge">
+                <span>&#9679; Aktiv</span>
+            </div>
+        </header>
+        <main>
+            <section class="file-upload exam">
+                <h2><span class="icon">&#128196;</span> Klausur hochladen</h2>
+                <form action="{% url 'upload_exam' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ exam_form.file }}
+                    {{ exam_form.file.errors }}
+                    <button class="btn upload" type="submit">Upload</button>
+                </form>
+                <ul class="file-list">
+                {% for f in exam_files %}
+                    <li>
+                        <span class="filename">{{ f.file.name|cut:"exam_files/" }}</span>
+                        <a class="btn remove" href="{% url 'delete_exam' f.pk %}" aria-label="Klausur entfernen">&#10006;</a>
+                    </li>
+                {% empty %}
+                    <li class="empty">Keine Klausur hochgeladen.</li>
+                {% endfor %}
+                </ul>
+            </section>
+
+            <section class="file-upload context">
+                <h2><span class="icon">&#128206;</span> Kontextdatei hochladen</h2>
+                <form action="{% url 'upload_context' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ context_form.file }}
+                    {{ context_form.file.errors }}
+                    <button class="btn upload" type="submit">Upload</button>
+                </form>
+                <ul class="file-list">
+                {% for f in context_files %}
+                    <li>
+                        <span class="filename">{{ f.file.name|cut:"context_files/" }}</span>
+                        <a class="btn remove" href="{% url 'delete_context' f.pk %}" aria-label="Kontext entfernen">&#10006;</a>
+                    </li>
+                {% empty %}
+                    <li class="empty">Keine Kontextdateien hochgeladen.</li>
+                {% endfor %}
+                </ul>
+            </section>
+        </main>
+        <footer>
+            <button class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
+        </footer>
+    </div>
+
+    <script>
+        const actionBtn = document.querySelector('.btn.main-action');
+        const hasExam = {{ exam_files|length }} > 0;
+        const hasContext = {{ context_files|length }} > 0;
+        if (hasExam && hasContext) {
+            actionBtn.removeAttribute('disabled');
+            actionBtn.removeAttribute('title');
+        }
+
+        actionBtn.addEventListener('click', () => {
+            if (actionBtn.disabled) return;
+            actionBtn.setAttribute('disabled', '');
+            const spinner = document.createElement('span');
+            spinner.className = 'spinner';
+            actionBtn.appendChild(spinner);
+        });
+    </script>
+</body>
+</html>
