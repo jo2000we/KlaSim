@@ -7,4 +7,5 @@ urlpatterns = [
     path('upload/exam/', views.upload_exam, name='upload_exam'),
     path('delete/context/<int:pk>/', views.delete_context, name='delete_context'),
     path('delete/exam/<int:pk>/', views.delete_exam, name='delete_exam'),
+    path('run/', views.run_simulation, name='run_simulation'),
 ]

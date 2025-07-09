@@ -4,8 +4,12 @@ import uuid
 
 from django.shortcuts import get_object_or_404, redirect, render
 
+from django.contrib import messages
+from django.conf import settings
+
 from .forms import ContextUploadForm, ExamUploadForm
-from .models import ContextFile, ExamFile
+from .models import ContextFile, ExamFile, AIResult
+from .services import generate_ai_results
 
 
 def _ensure_session_id(request) -> str:
@@ -24,6 +28,7 @@ def index(request):
         ContextFile.objects.filter(session_id=session_id) if session_id else []
     )
     exam_files = ExamFile.objects.filter(session_id=session_id) if session_id else []
+    ai_results = AIResult.objects.filter(session_id=session_id) if session_id else []
     return render(
         request,
         "simulator/index.html",
@@ -33,6 +38,7 @@ def index(request):
             "context_files": context_files,
             "exam_files": exam_files,
             "session_id": session_id,
+            "ai_results": ai_results,
         },
     )
 
@@ -111,4 +117,19 @@ def delete_exam(request, pk: int):
     file_obj = get_object_or_404(ExamFile, pk=pk, session_id=session_id)
     file_obj.file.delete(save=False)
     file_obj.delete()
+    return redirect("index")
+
+
+def run_simulation(request):
+    """Execute the AI simulation for the current session."""
+    session_id = request.session.get("session_id")
+    if not session_id:
+        return redirect("index")
+
+    try:
+        generate_ai_results(session_id, api_key=getattr(settings, "OPENAI_API_KEY", None))
+        messages.success(request, "Simulation abgeschlossen.")
+    except Exception as exc:  # pragma: no cover - best effort
+        messages.error(request, f"Simulation fehlgeschlagen: {exc}")
+
     return redirect("index")
