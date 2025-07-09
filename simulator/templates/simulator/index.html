@@ -17,6 +17,13 @@
                 <span>&#9679; Aktiv</span>
             </div>
         </header>
+        {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
         <main>
             <section class="file-upload exam">
                 <h2><span class="icon">&#128196;</span> Klausur hochladen</h2>
@@ -57,9 +64,25 @@
                 {% endfor %}
                 </ul>
             </section>
+
+            {% if ai_results %}
+            <section class="ai-results">
+                <h2><span class="icon">&#128196;</span> Ergebnisse</h2>
+                <ul class="file-list">
+                {% for r in ai_results %}
+                    <li>
+                        <a href="{{ r.file.url }}" download>{{ r.level }} Ergebnis</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
         </main>
         <footer>
-            <button class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
+            <form action="{% url 'run_simulation' %}" method="post">
+                {% csrf_token %}
+                <button class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
+            </form>
         </footer>
     </div>
 
