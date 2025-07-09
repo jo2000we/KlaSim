@@ -125,7 +125,7 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
 
         result = AIResult(level=level, session_id=session_id)
         with open(file_path, "rb") as fh:
-            result.file.save(f"ai_results/{session_id}/{file_name}", File(fh), save=True)
+            result.file.save(f"{session_id}/{file_name}", File(fh), save=True)
         results.append(result)
 
     return results
