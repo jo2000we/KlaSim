@@ -11,24 +11,39 @@ from simulator.models import ContextFile, ExamFile, AIResult
 
 
 class Command(BaseCommand):
-    """Delete files and DB entries for sessions older than SESSION_LIFETIME_DAYS."""
+    """Delete files and DB entries for sessions."""
 
     help = (
         "Remove uploaded files and database objects for stale sessions "
-        "and clear expired Django sessions."
+        "and clear expired Django sessions. Use --all to remove everything."
     )
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--all",
+            action="store_true",
+            help="Delete all sessions regardless of age",
+        )
 
     def handle(self, *args, **options):
         lifetime = getattr(settings, "SESSION_LIFETIME_DAYS", 7)
         cutoff = timezone.now() - timedelta(days=lifetime)
 
         try:
-            session_ids = set(
-                ContextFile.objects.filter(upload_time__lt=cutoff).values_list("session_id", flat=True)
-            )
-            session_ids.update(
-                ExamFile.objects.filter(upload_time__lt=cutoff).values_list("session_id", flat=True)
-            )
+            if options.get("all"):
+                session_ids = set(ContextFile.objects.values_list("session_id", flat=True))
+                session_ids.update(ExamFile.objects.values_list("session_id", flat=True))
+                session_ids.update(AIResult.objects.values_list("session_id", flat=True))
+            else:
+                session_ids = set(
+                    ContextFile.objects.filter(upload_time__lt=cutoff).values_list("session_id", flat=True)
+                )
+                session_ids.update(
+                    ExamFile.objects.filter(upload_time__lt=cutoff).values_list("session_id", flat=True)
+                )
+                session_ids.update(
+                    AIResult.objects.filter(session_id__in=session_ids).values_list("session_id", flat=True)
+                )
         except OperationalError:
             self.stdout.write("Database not initialized; skipping cleanup.")
             return
@@ -45,7 +60,8 @@ class Command(BaseCommand):
                 if session_dir.exists():
                     shutil.rmtree(session_dir, ignore_errors=True)
 
-            self.stdout.write(f"Deleted {len(session_ids)} stale session(s).")
+            label = "session(s)" if options.get("all") else "stale session(s)"
+            self.stdout.write(f"Deleted {len(session_ids)} {label}.")
         else:
             self.stdout.write("No stale sessions found.")
 

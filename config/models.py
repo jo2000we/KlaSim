@@ -5,7 +5,7 @@ class AppConfig(models.Model):
     """Singleton-style configuration for the application."""
 
     admin_password_hash = models.CharField(max_length=128)
-    openai_api_key = models.CharField(max_length=100)
+    openai_api_key = models.CharField(max_length=200)
     simulation_password_hash = models.CharField(max_length=128, blank=True)
     language = models.CharField(max_length=5, choices=[("en", "English"), ("de", "Deutsch")], default="en")
     setup_complete = models.BooleanField(default=False)
