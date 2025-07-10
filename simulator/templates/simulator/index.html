@@ -13,20 +13,17 @@
     <div class="container">
         <header>
             <h1>Klausur-Simulator</h1>
-            <div class="session-badge">
+            <div class="status-indicator
+                {% if setup_required %} warn{% elif not api_key_valid %} error{% else %} ok{% endif %}">
                 {% if setup_required %}
-                    <a href="{% url 'setup' %}" style="color:#ff0;text-decoration:none;">Setup required</a>
+                    <a href="{% url 'setup' %}">Setup</a>
+                {% elif not api_key_valid %}
+                    &#9679; Key Fail
                 {% else %}
-                    <span>&#9679; Aktiv</span>
+                    &#9679; Aktiv
                 {% endif %}
             </div>
-            <div class="session-badge{% if not api_key_valid %} error{% endif %}" style="margin-left:10px;">
-                {% if api_key_valid %}
-                    <span>&#9679; Key OK</span>
-                {% else %}
-                    <span>&#9679; Key Fail</span>
-                {% endif %}
-            </div>
+            <a class="settings-link" href="{% url 'settings' %}" title="Settings">&#9881;</a>
         </header>
 
         {% if messages %}

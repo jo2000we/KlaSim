@@ -173,6 +173,6 @@ def download_session_zip(request, session_id: str):
 def cleanup_sessions_view(request):
     """Delete all stored sessions and files."""
     if request.method == "POST":
-        call_command("clean_sessions")
+        call_command("clean_sessions", all=True)
         messages.success(request, "Sessions deleted")
     return redirect("sessions")
