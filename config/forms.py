@@ -1,13 +1,19 @@
 from django import forms
 from .models import AppConfig
+from django.utils.translation import gettext_lazy as _
+
 
 class SetupForm(forms.ModelForm):
-    admin_password = forms.CharField(widget=forms.PasswordInput)
-    simulation_password = forms.CharField(widget=forms.PasswordInput, required=False)
+    admin_password = forms.CharField(label=_("Admin password"), widget=forms.PasswordInput)
+    simulation_password = forms.CharField(label=_("Simulation password"), widget=forms.PasswordInput, required=False)
 
     class Meta:
         model = AppConfig
         fields = ["openai_api_key", "language"]
+        labels = {
+            "openai_api_key": _("OpenAI API Key"),
+            "language": _("Language"),
+        }
 
     def save(self, commit=True):
         config = super().save(commit=False)
@@ -23,19 +29,28 @@ class SetupForm(forms.ModelForm):
 
 
 class LoginForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(label=_('Password'), widget=forms.PasswordInput)
 
 
 class SettingsForm(forms.ModelForm):
     new_password = forms.CharField(
+        label=_("New settings password"),
         widget=forms.PasswordInput(attrs={"style": "display:none;"}),
         required=False,
     )
-    simulation_password = forms.CharField(widget=forms.PasswordInput, required=False)
+    simulation_password = forms.CharField(
+        label=_("Simulation password"),
+        widget=forms.PasswordInput,
+        required=False,
+    )
 
     class Meta:
         model = AppConfig
         fields = ["openai_api_key", "language"]
+        labels = {
+            "openai_api_key": _("OpenAI API Key"),
+            "language": _("Language"),
+        }
 
     def save(self, commit=True):
         config = super().save(commit=False)

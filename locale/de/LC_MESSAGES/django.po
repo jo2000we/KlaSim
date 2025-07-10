@@ -1,0 +1,159 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-10 21:20+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: KlaSim/settings.py:115
+msgid "English"
+msgstr "Englisch"
+
+#: KlaSim/settings.py:116
+msgid "Deutsch"
+msgstr "Deutsch"
+
+#: config/forms.py:6
+msgid "Admin password"
+msgstr "Admin-Passwort"
+
+#: config/forms.py:7 config/forms.py:41
+msgid "Simulation password"
+msgstr "Simulations-Passwort"
+
+#: config/forms.py:13 config/forms.py:50
+#: config/templates/config/settings.html:38
+msgid "OpenAI API Key"
+msgstr "OpenAI API-Schlüssel"
+
+#: config/forms.py:14 config/forms.py:51
+msgid "Language"
+msgstr "Sprache"
+
+#: config/forms.py:31
+msgid "Password"
+msgstr "Passwort"
+
+#: config/forms.py:36
+msgid "New settings password"
+msgstr "Neues Einstellungs-Passwort"
+
+#: config/templates/config/settings.html:7
+#: config/templates/config/settings.html:13
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: config/templates/config/settings.html:14
+msgid "Close Settings"
+msgstr "Einstellungen schließen"
+
+#: config/templates/config/settings.html:15
+msgid "Sessions"
+msgstr "Sitzungen"
+
+#: config/templates/config/settings.html:39
+#: config/templates/config/settings.html:118
+msgid "Valid"
+msgstr "Gültig"
+
+#: config/templates/config/settings.html:39
+#: config/templates/config/settings.html:119
+msgid "Invalid"
+msgstr "Ungültig"
+
+#: config/templates/config/settings.html:41
+msgid "Used to access the OpenAI API."
+msgstr "Wird zum Zugriff auf die OpenAI-API verwendet."
+
+#: config/templates/config/settings.html:48
+msgid "Set new Settings-Password"
+msgstr "Neues Einstellungs-Passwort setzen"
+
+#: config/templates/config/settings.html:52
+msgid "Require Simulation Password"
+msgstr "Simulations-Passwort erforderlich"
+
+#: config/templates/config/settings.html:60
+msgid "Protects against unwanted costs in public networks."
+msgstr "Schützt vor unerwünschten Kosten in öffentlichen Netzen."
+
+#: config/templates/config/settings.html:64
+#, python-format
+msgid "Prompts (%(language)s)"
+msgstr "Prompts (%(language)s)"
+
+#: config/templates/config/settings.html:68
+msgid "System Prompt"
+msgstr "System-Prompt"
+
+#: config/templates/config/settings.html:74
+msgid "Base Instruction"
+msgstr "Basisanweisung"
+
+#: config/templates/config/settings.html:80
+msgid "Level Low"
+msgstr "Niveau Niedrig"
+
+#: config/templates/config/settings.html:86
+msgid "Level Medium"
+msgstr "Niveau Mittel"
+
+#: config/templates/config/settings.html:92
+msgid "Level High"
+msgstr "Niveau Hoch"
+
+#: config/templates/config/settings.html:101
+msgid "New password"
+msgstr "Neues Passwort"
+
+#: config/templates/config/settings.html:103
+msgid "Confirm password"
+msgstr "Passwort bestätigen"
+
+#: config/templates/config/settings.html:106
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: config/templates/config/settings.html:107
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: config/templates/config/settings.html:120
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+#: config/templates/config/settings.html:121
+msgid "Default"
+msgstr "Standard"
+
+#: config/templates/config/settings.html:122
+msgid "On"
+msgstr "Ein"
+
+#: config/templates/config/settings.html:123
+msgid "Off"
+msgstr "Aus"
+
+#: config/templates/config/settings.html:124
+msgid "Passwords do not match"
+msgstr "Passwörter stimmen nicht überein"
+
+#: config/views.py:108
+msgid "Settings saved"
+msgstr "Einstellungen gespeichert"
+
+#: config/views.py:179
+msgid "Sessions deleted"
+msgstr "Sitzungen gelöscht"

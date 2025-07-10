@@ -1,18 +1,29 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Settings</title>
+    <title>{% trans "Settings" %}</title>
     <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>Settings</h1>
-        <a class="btn" href="{% url 'logout' %}">Close Settings</a>
-        <a class="btn" href="{% url 'sessions' %}">Sessions</a>
+        <h1>{% trans "Settings" %}</h1>
+        <a class="btn" href="{% url 'logout' %}">{% trans "Close Settings" %}</a>
+        <a class="btn" href="{% url 'sessions' %}">{% trans "Sessions" %}</a>
+        <form action="{% url 'set_language' %}" method="post" style="display:inline-block;margin-left:1em;">
+            {% csrf_token %}
+            <select name="language" onchange="this.form.submit()">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% for lang in LANGUAGES %}
+                    <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %}selected{% endif %}>{{ lang.1 }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="next" value="{{ request.path }}?{{ request.GET.urlencode }}">
+        </form>
     </header>
     {% if messages %}
     <ul class="messages">
@@ -24,21 +35,21 @@
     <form id="settingsForm" class="settings-grid" method="post">
         {% csrf_token %}
         <div>
-            <label for="id_openai_api_key">OpenAI API Key</label>
-            <span id="keyStatus" class="state-label">{% if key_valid %}Valid{% else %}Invalid{% endif %}</span><br>
+            <label for="id_openai_api_key">{% trans "OpenAI API Key" %}</label>
+            <span id="keyStatus" class="state-label">{% if key_valid %}{% trans "Valid" %}{% else %}{% trans "Invalid" %}{% endif %}</span><br>
             {{ form.openai_api_key }}
-            <p class="description">Used to access the OpenAI API.</p>
+            <p class="description">{% trans "Used to access the OpenAI API." %}</p>
         </div>
         <div>
             {{ form.language.label_tag }}
             {{ form.language }}
         </div>
         <div class="single">
-            <button type="button" id="newPwBtn" class="btn">Set new Settings-Password</button>
+            <button type="button" id="newPwBtn" class="btn">{% trans "Set new Settings-Password" %}</button>
             {{ form.new_password }}
         </div>
         <div>
-            <label class="toggle-label" for="simPwToggle">Require Simulation Password</label>
+            <label class="toggle-label" for="simPwToggle">{% trans "Require Simulation Password" %}</label>
             <label class="switch">
                 <input type="checkbox" id="simPwToggle" {% if sim_pw_set %}checked{% endif %}>
                 <span class="slider"></span>
@@ -46,39 +57,39 @@
             <span class="state-label" data-for="simPwToggle"></span><br>
             <div id="simPwContainer"{% if not sim_pw_set %} style="display:none;"{% endif %}>
                 {{ form.simulation_password }}
-                <p class="description">Protects against unwanted costs in public networks.</p>
+                <p class="description">{% trans "Protects against unwanted costs in public networks." %}</p>
             </div>
         </div>
         <fieldset>
-            <legend>Prompts ({{ language }})</legend>
+            <legend>{% blocktrans %}Prompts ({{ language }}){% endblocktrans %}</legend>
             <div>
                 <label class="switch">{{ prompt_form.system_custom }}<span class="slider"></span></label>
                 <span class="state-label" data-for="id_system_custom"></span>
-                <span class="toggle-label">System Prompt</span><br>
+                <span class="toggle-label">{% trans "System Prompt" %}</span><br>
                 {{ prompt_form.system_text }}
             </div>
             <div>
                 <label class="switch">{{ prompt_form.base_custom }}<span class="slider"></span></label>
                 <span class="state-label" data-for="id_base_custom"></span>
-                <span class="toggle-label">Base Instruction</span><br>
+                <span class="toggle-label">{% trans "Base Instruction" %}</span><br>
                 {{ prompt_form.base_text }}
             </div>
             <div>
                 <label class="switch">{{ prompt_form.level_low_custom }}<span class="slider"></span></label>
                 <span class="state-label" data-for="id_level_low_custom"></span>
-                <span class="toggle-label">Level Low</span><br>
+                <span class="toggle-label">{% trans "Level Low" %}</span><br>
                 {{ prompt_form.level_low_text }}
             </div>
             <div>
                 <label class="switch">{{ prompt_form.level_medium_custom }}<span class="slider"></span></label>
                 <span class="state-label" data-for="id_level_medium_custom"></span>
-                <span class="toggle-label">Level Medium</span><br>
+                <span class="toggle-label">{% trans "Level Medium" %}</span><br>
                 {{ prompt_form.level_medium_text }}
             </div>
             <div>
                 <label class="switch">{{ prompt_form.level_high_custom }}<span class="slider"></span></label>
                 <span class="state-label" data-for="id_level_high_custom"></span>
-                <span class="toggle-label">Level High</span><br>
+                <span class="toggle-label">{% trans "Level High" %}</span><br>
                 {{ prompt_form.level_high_text }}
             </div>
         </fieldset>
@@ -87,13 +98,13 @@
 
 <div id="pwModal" class="modal-backdrop">
     <div class="modal">
-        <label for="pw1">New password</label>
+        <label for="pw1">{% trans "New password" %}</label>
         <input type="password" id="pw1">
-        <label for="pw2">Confirm password</label>
+        <label for="pw2">{% trans "Confirm password" %}</label>
         <input type="password" id="pw2">
         <div class="modal-actions">
-            <button type="button" id="pwCancel" class="btn remove">Cancel</button>
-            <button type="button" id="pwConfirm" class="btn main-action">Confirm</button>
+            <button type="button" id="pwCancel" class="btn remove">{% trans "Cancel" %}</button>
+            <button type="button" id="pwConfirm" class="btn main-action">{% trans "Confirm" %}</button>
         </div>
     </div>
 </div>
@@ -102,6 +113,15 @@ const form = document.getElementById('settingsForm');
 const keyInput = document.getElementById('id_openai_api_key');
 const statusEl = document.getElementById('keyStatus');
 const langSelect = document.getElementById('id_language');
+let simToggle;
+let simField;
+const TXT_VALID = "{{ _('Valid') }}";
+const TXT_INVALID = "{{ _('Invalid') }}";
+const TXT_CUSTOM = "{{ _('Custom') }}";
+const TXT_DEFAULT = "{{ _('Default') }}";
+const TXT_ON = "{{ _('On') }}";
+const TXT_OFF = "{{ _('Off') }}";
+const TXT_NO_MATCH = "{{ _('Passwords do not match') }}";
 
 async function checkKey() {
     const resp = await fetch('{% url "test_key" %}', {
@@ -113,7 +133,7 @@ async function checkKey() {
         body: new URLSearchParams({api_key: keyInput.value})
     });
     const data = await resp.json();
-    statusEl.textContent = data.ok ? 'Valid' : 'Invalid';
+    statusEl.textContent = data.ok ? TXT_VALID : TXT_INVALID;
     statusEl.style.color = data.ok ? '#b9fbc0' : '#ff6565';
 }
 
@@ -143,21 +163,21 @@ function toggleFields() {
         if (chk && field) {
             const update = () => {
                 field.disabled = !chk.checked;
-                if (stateLabel) stateLabel.textContent = chk.checked ? 'Custom' : 'Default';
+                if (stateLabel) stateLabel.textContent = chk.checked ? TXT_CUSTOM : TXT_DEFAULT;
             };
             update();
             chk.addEventListener('change', update);
         }
     }
 
-    const simToggle = document.getElementById('simPwToggle');
-    const simField = document.getElementById('id_simulation_password');
+    simToggle = document.getElementById('simPwToggle');
+    simField = document.getElementById('id_simulation_password');
     const simContainer = document.getElementById('simPwContainer');
     const simLabel = document.querySelector('span.state-label[data-for="simPwToggle"]');
     if (simToggle && simField) {
         const updateSim = () => {
             simField.disabled = !simToggle.checked;
-            if (simLabel) simLabel.textContent = simToggle.checked ? 'On' : 'Off';
+            if (simLabel) simLabel.textContent = simToggle.checked ? TXT_ON : TXT_OFF;
             if (simContainer) simContainer.style.display = simToggle.checked ? 'block' : 'none';
         };
         updateSim();
@@ -187,7 +207,7 @@ if (newPwBtn && pwModal) {
     });
     pwConfirm.addEventListener('click', () => {
         if (pw1.value !== pw2.value) {
-            alert('Passwords do not match');
+            alert(TXT_NO_MATCH);
             return;
         }
         hiddenNewPw.value = pw1.value;
@@ -198,10 +218,28 @@ if (newPwBtn && pwModal) {
 
 document.querySelectorAll('#settingsForm input, #settingsForm select, #settingsForm textarea')
     .forEach(el => {
+        if (el.id === 'simPwToggle' || el.id === 'id_simulation_password') return;
         el.addEventListener('change', () => {
             form.requestSubmit();
         });
     });
+
+if (simToggle) {
+    simToggle.addEventListener('change', () => {
+        if (!simToggle.checked) {
+            form.requestSubmit();
+        }
+    });
+}
+
+if (simField) {
+    simField.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            form.requestSubmit();
+        }
+    });
+}
 </script>
 </body>
 </html>

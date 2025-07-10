@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 db.sqlite3
 .env
+locale/de/LC_MESSAGES/django.mo
+locale/en/LC_MESSAGES/django.mo
