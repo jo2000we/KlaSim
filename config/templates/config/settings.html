@@ -21,7 +21,7 @@
     {% endfor %}
     </ul>
     {% endif %}
-    <form id="settingsForm" method="post">
+    <form id="settingsForm" class="settings-grid" method="post">
         {% csrf_token %}
         <div>
             <label for="id_openai_api_key">OpenAI API Key</label>
@@ -34,8 +34,8 @@
             {{ form.language }}
         </div>
         <div>
-            <label for="id_new_password">Set new Settings-Password</label>
-            {{ form.new_password }}
+            <button type="button" id="newPwBtn" class="btn">Set new Settings-Password</button>
+            {{ form.new_password.as_widget(attrs={'style': 'display:none;'}) }}
         </div>
         <div>
             <label class="toggle-label" for="simPwToggle">Require Simulation Password</label>
@@ -44,8 +44,10 @@
                 <span class="slider"></span>
             </label>
             <span class="state-label" data-for="simPwToggle"></span><br>
-            {{ form.simulation_password }}
-            <p class="description">Protects against unwanted costs in public networks.</p>
+            <div id="simPwContainer"{% if not sim_pw_set %} style="display:none;"{% endif %}>
+                {{ form.simulation_password }}
+                <p class="description">Protects against unwanted costs in public networks.</p>
+            </div>
         </div>
         <fieldset>
             <legend>Prompts ({{ language }})</legend>
@@ -82,6 +84,19 @@
         </fieldset>
         <button class="btn main-action" type="submit">Save</button>
     </form>
+</div>
+
+<div id="pwModal" class="modal-backdrop">
+    <div class="modal">
+        <label for="pw1">New password</label>
+        <input type="password" id="pw1">
+        <label for="pw2">Confirm password</label>
+        <input type="password" id="pw2">
+        <div class="modal-actions">
+            <button type="button" id="pwCancel" class="btn remove">Cancel</button>
+            <button type="button" id="pwConfirm" class="btn main-action">Confirm</button>
+        </div>
+    </div>
 </div>
 <script>
 const form = document.getElementById('settingsForm');
@@ -138,11 +153,13 @@ function toggleFields() {
 
     const simToggle = document.getElementById('simPwToggle');
     const simField = document.getElementById('id_simulation_password');
+    const simContainer = document.getElementById('simPwContainer');
     const simLabel = document.querySelector('span.state-label[data-for="simPwToggle"]');
     if (simToggle && simField) {
         const updateSim = () => {
             simField.disabled = !simToggle.checked;
             if (simLabel) simLabel.textContent = simToggle.checked ? 'On' : 'Off';
+            if (simContainer) simContainer.style.display = simToggle.checked ? 'block' : 'none';
         };
         updateSim();
         simToggle.addEventListener('change', updateSim);
@@ -150,6 +167,34 @@ function toggleFields() {
 }
 
 toggleFields();
+
+const newPwBtn = document.getElementById('newPwBtn');
+const pwModal = document.getElementById('pwModal');
+const pwCancel = document.getElementById('pwCancel');
+const pwConfirm = document.getElementById('pwConfirm');
+const pw1 = document.getElementById('pw1');
+const pw2 = document.getElementById('pw2');
+const hiddenNewPw = document.getElementById('id_new_password');
+
+if (newPwBtn && pwModal) {
+    newPwBtn.addEventListener('click', () => {
+        pw1.value = '';
+        pw2.value = '';
+        pwModal.style.display = 'flex';
+        pw1.focus();
+    });
+    pwCancel.addEventListener('click', () => {
+        pwModal.style.display = 'none';
+    });
+    pwConfirm.addEventListener('click', () => {
+        if (pw1.value !== pw2.value) {
+            alert('Passwords do not match');
+            return;
+        }
+        hiddenNewPw.value = pw1.value;
+        pwModal.style.display = 'none';
+    });
+}
 </script>
 </body>
 </html>
