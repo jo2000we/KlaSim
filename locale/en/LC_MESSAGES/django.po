@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-10 21:20+0000\n"
+"POT-Creation-Date: 2025-07-10 23:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,41 +17,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: KlaSim/settings.py:115
+
+#: KlaSim/settings.py:110
 msgid "English"
 msgstr "English"
 
-#: KlaSim/settings.py:116
+#: KlaSim/settings.py:111
 msgid "Deutsch"
 msgstr "German"
 
-#: config/forms.py:6
+#: config/forms.py:7
 msgid "Admin password"
 msgstr "Admin password"
 
-#: config/forms.py:7 config/forms.py:41
+#: config/forms.py:8 config/forms.py:42
 msgid "Simulation password"
 msgstr "Simulation password"
 
-#: config/forms.py:13 config/forms.py:50
-#: config/templates/config/settings.html:38
+#: config/forms.py:14 config/forms.py:51
+#: config/templates/config/settings.html:27
 msgid "OpenAI API Key"
 msgstr "OpenAI API Key"
 
-#: config/forms.py:14 config/forms.py:51
+#: config/forms.py:15 config/forms.py:52
 msgid "Language"
 msgstr "Language"
 
-#: config/forms.py:31
+#: config/forms.py:32
 msgid "Password"
 msgstr "Password"
 
-#: config/forms.py:36
+#: config/forms.py:37
 msgid "New settings password"
 msgstr "New settings password"
 
+#: config/templates/config/login.html:7
+#, fuzzy
+#| msgid "Close Settings"
+msgid "Unlock Settings"
+msgstr "Unlock Settings"
+
+#: config/templates/config/login.html:12
+msgid "Enter password to unlock Settings"
+msgstr "Enter password to unlock Settings"
+
+#: config/templates/config/login.html:17
+msgid "Unlock"
+msgstr "Unlock"
+
+#: config/templates/config/sessions.html:7
+#: config/templates/config/sessions.html:13
+#: config/templates/config/settings.html:15
+msgid "Sessions"
+msgstr "Sessions"
+
+#: config/templates/config/sessions.html:14
+msgid "Back"
+msgstr "Back"
+
+#: config/templates/config/sessions.html:25
+msgid "Delete all sessions?"
+msgstr "Delete all sessions?"
+
+#: config/templates/config/sessions.html:25
+msgid "Delete All Sessions"
+msgstr "Delete All Sessions"
+
+#: config/templates/config/sessions.html:31
+msgid "Download ZIP"
+msgstr "Download ZIP"
+
+#: config/templates/config/sessions.html:34
+msgid "Exam"
+msgstr "Exam"
+
+#: config/templates/config/sessions.html:37
+msgid "Context"
+msgstr "Context"
+
+#: config/templates/config/sessions.html:40
+#: simulator/templates/simulator/index.html:82
+msgid "Result"
+msgstr "Result"
+
+#: config/templates/config/sessions.html:45
+msgid "No sessions found."
+msgstr "No sessions found."
+
 #: config/templates/config/settings.html:7
 #: config/templates/config/settings.html:13
+#: simulator/templates/simulator/index.html:24
 msgid "Settings"
 msgstr "Settings"
 
@@ -59,101 +114,159 @@ msgstr "Settings"
 msgid "Close Settings"
 msgstr "Close Settings"
 
-#: config/templates/config/settings.html:15
-msgid "Sessions"
-msgstr "Sessions"
-
-#: config/templates/config/settings.html:39
-#: config/templates/config/settings.html:118
+#: config/templates/config/settings.html:28
+#: config/templates/config/settings.html:107
 msgid "Valid"
 msgstr "Valid"
 
-#: config/templates/config/settings.html:39
-#: config/templates/config/settings.html:119
+#: config/templates/config/settings.html:28
+#: config/templates/config/settings.html:108
 msgid "Invalid"
 msgstr "Invalid"
 
-#: config/templates/config/settings.html:41
+#: config/templates/config/settings.html:30
 msgid "Used to access the OpenAI API."
 msgstr "Used to access the OpenAI API."
 
-#: config/templates/config/settings.html:48
+#: config/templates/config/settings.html:37
 msgid "Set new Settings-Password"
 msgstr "Set new Settings-Password"
 
-#: config/templates/config/settings.html:52
+#: config/templates/config/settings.html:41
 msgid "Require Simulation Password"
 msgstr "Require Simulation Password"
 
-#: config/templates/config/settings.html:60
+#: config/templates/config/settings.html:49
 msgid "Protects against unwanted costs in public networks."
 msgstr "Protects against unwanted costs in public networks."
 
-#: config/templates/config/settings.html:64
+#: config/templates/config/settings.html:53
 #, python-format
 msgid "Prompts (%(language)s)"
 msgstr "Prompts (%(language)s)"
 
-#: config/templates/config/settings.html:68
+#: config/templates/config/settings.html:57
 msgid "System Prompt"
 msgstr "System Prompt"
 
-#: config/templates/config/settings.html:74
+#: config/templates/config/settings.html:63
 msgid "Base Instruction"
 msgstr "Base Instruction"
 
-#: config/templates/config/settings.html:80
+#: config/templates/config/settings.html:69
 msgid "Level Low"
 msgstr "Level Low"
 
-#: config/templates/config/settings.html:86
+#: config/templates/config/settings.html:75
 msgid "Level Medium"
 msgstr "Level Medium"
 
-#: config/templates/config/settings.html:92
+#: config/templates/config/settings.html:81
 msgid "Level High"
 msgstr "Level High"
 
-#: config/templates/config/settings.html:101
+#: config/templates/config/settings.html:90
 msgid "New password"
 msgstr "New password"
 
-#: config/templates/config/settings.html:103
+#: config/templates/config/settings.html:92
 msgid "Confirm password"
 msgstr "Confirm password"
 
-#: config/templates/config/settings.html:106
+#: config/templates/config/settings.html:95
 msgid "Cancel"
 msgstr "Cancel"
 
-#: config/templates/config/settings.html:107
+#: config/templates/config/settings.html:96
 msgid "Confirm"
 msgstr "Confirm"
 
-#: config/templates/config/settings.html:120
+#: config/templates/config/settings.html:109
 msgid "Custom"
 msgstr "Custom"
 
-#: config/templates/config/settings.html:121
+#: config/templates/config/settings.html:110
 msgid "Default"
 msgstr "Default"
 
-#: config/templates/config/settings.html:122
+#: config/templates/config/settings.html:111
 msgid "On"
 msgstr "On"
 
-#: config/templates/config/settings.html:123
+#: config/templates/config/settings.html:112
 msgid "Off"
 msgstr "Off"
 
-#: config/templates/config/settings.html:124
+#: config/templates/config/settings.html:113
 msgid "Passwords do not match"
 msgstr "Passwords do not match"
 
-#: config/views.py:108
-msgid "Settings saved"
-msgstr "Settings saved"
+#: simulator/templates/simulator/index.html:7
+#: simulator/templates/simulator/index.html:13
+msgid "Exam Simulator"
+msgstr "Exam Simulator"
 
-#: config/views.py:179
-msgid "Sessions deleted"
-msgstr "Sessions deleted"
+#: simulator/templates/simulator/index.html:16
+msgid "Setup"
+msgstr "Setup"
+
+#: simulator/templates/simulator/index.html:18
+msgid "Key Fail"
+msgstr "Key Fail"
+
+#: simulator/templates/simulator/index.html:20
+msgid "Active"
+msgstr "Active"
+
+#: simulator/templates/simulator/index.html:37
+msgid "Upload Exam"
+msgstr "Upload Exam"
+
+#: simulator/templates/simulator/index.html:42
+#: simulator/templates/simulator/index.html:62
+msgid "Upload"
+msgstr "Upload"
+
+#: simulator/templates/simulator/index.html:48
+msgid "Remove exam"
+msgstr "Remove exam"
+
+#: simulator/templates/simulator/index.html:51
+msgid "No exam uploaded."
+msgstr "No exam uploaded."
+
+#: simulator/templates/simulator/index.html:57
+msgid "Upload Context"
+msgstr "Upload Context"
+
+#: simulator/templates/simulator/index.html:68
+msgid "Remove context"
+msgstr "Remove context"
+
+#: simulator/templates/simulator/index.html:71
+msgid "No context files uploaded."
+msgstr "No context files uploaded."
+
+#: simulator/templates/simulator/index.html:78
+msgid "Results"
+msgstr "Results"
+
+#: simulator/templates/simulator/index.html:93
+msgid "Upload files first"
+msgstr "Upload files first"
+
+#: simulator/templates/simulator/index.html:93
+msgid "Start AI simulation"
+msgstr "Start AI simulation"
+
+#: simulator/templates/simulator/index.html:105
+#, fuzzy
+#| msgid "New password"
+msgid "Enter password"
+msgstr "Enter password"
+
+#~ msgid "Settings saved"
+#~ msgstr "Settings saved"
+
+#~ msgid "Sessions deleted"
+#~ msgstr "Sessions deleted"

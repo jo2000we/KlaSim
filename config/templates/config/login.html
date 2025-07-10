@@ -1,20 +1,20 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Unlock Settings</title>
+    <title>{% trans "Unlock Settings" %}</title>
     <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 </head>
 <body>
 <div class="container">
-    <h1>Enter Password to unlock Settings</h1>
+    <h1>{% trans "Enter password to unlock Settings" %}</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        <button class="btn main-action" type="submit">Unlock</button>
+        <button class="btn main-action" type="submit">{% trans "Unlock" %}</button>
     </form>
 </div>
 </body>
