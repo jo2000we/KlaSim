@@ -13,35 +13,9 @@ from docx import Document
 from PyPDF2 import PdfReader
 
 from .models import AIResult, ContextFile, ExamFile
+from config.utils import load_prompts
 
 
-LEVEL_INSTRUCTIONS = {
-    "low": (
-        "Bearbeite die Aufgabe so, als wärst du ein schwacher Schüler mit vielen Lücken "
-        "und Unsicherheiten. Mache typische Fehler, schreibe knapp oder lückenhaft, "
-        "beantworte nur das, was du sicher weißt. Antworte ggf. auch mit Falschantworten, "
-        "die im Kontext vorkommen könnten."
-    ),
-    "medium": (
-        "Bearbeite die Aufgabe als durchschnittlicher Schüler: gib solide, aber nicht "
-        "perfekte Antworten, manchmal fehlen Details oder es gibt kleinere Fehler."
-    ),
-    "high": (
-        "Bearbeite die Aufgabe als sehr guter Schüler: antworte vollständig, präzise "
-        "und mit korrekter Fachsprache. Gehe auch auf Details und Hintergründe ein, "
-        "sofern sie im Kontext stehen."
-    ),
-}
-
-BASE_INSTRUCTION = (
-    "Nutze ausschließlich die folgenden Kontextinformationen als Wissensquelle. "
-    "Beantworte die Klausuraufgabe so, wie es ein Schüler auf dem angegebenen Leistungsniveau tun würde. "
-    "Gib ausschließlich den Lösungstext, ohne Einleitung, Erklärung oder Wiederholung der Aufgabe. "
-    "Wenn dir Informationen fehlen, antworte wie ein Schüler, der das Thema nicht vollständig versteht. "
-    "Der Antwortstil soll dem einer echten Schülerklausur entsprechen: schreibe klar, aber nicht überperfekt. "
-    "Keine Kommentare, keine Meta-Texte. Die Antworten sollen sich sprachlich, inhaltlich und vom Stil an echten Schülerantworten orientieren. "
-    "Niemals den Aufgabenstellungstext wiederholen oder Zusammenfassungen geben."
-)
 
 
 def _read_file(path: str) -> str:
@@ -96,21 +70,19 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
         old.file.delete(save=False)
         old.delete()
 
+    prompts = load_prompts()
     results: List[AIResult] = []
-    for level, instruction in LEVEL_INSTRUCTIONS.items():
+    level_map = {
+        "low": prompts["level_low"],
+        "medium": prompts["level_medium"],
+        "high": prompts["level_high"],
+    }
+    for level, instruction in level_map.items():
         messages = [
-            {
-                "role": "system",
-                "content": (
-                    "Du bist ein Sch\u00fcler, der eine Klausur schreibt. "
-                    "Alle Antworten sollen realistisch wirken und keine Einleitungen oder Kommentare enthalten. "
-                    "Die Antworten sollen sich sprachlich, inhaltlich und vom Stil an echten Sch\u00fclerantworten orientieren. "
-                    "Niemals den Aufgabenstellungstext wiederholen oder Zusammenfassungen geben."
-                ),
-            },
+            {"role": "system", "content": prompts["system"]},
             {
                 "role": "user",
-                "content": f"{base_prompt}\n\n{BASE_INSTRUCTION}\n{instruction}",
+                "content": f"{base_prompt}\n\n{prompts['base']}\n{instruction}",
             },
         ]
         model = getattr(settings, "OPENAI_MODEL", "gpt-4-1106-preview")

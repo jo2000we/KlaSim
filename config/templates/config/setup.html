@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initial Setup</title>
+    <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <h1>Initial Setup</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn main-action" type="submit">Save</button>
+    </form>
+</div>
+</body>
+</html>

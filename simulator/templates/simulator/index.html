@@ -13,8 +13,13 @@
     <div class="container">
         <header>
             <h1>Klausur-Simulator</h1>
-            <div class="session-badge">
-                <span>&#9679; Aktiv</span>
+            <div class="header-right">
+                <div class="session-badge {{ status.class }}">
+                    <a href="{{ status.url }}" style="color:inherit;text-decoration:none;">
+                        {{ status.text }}
+                    </a>
+                </div>
+                <a class="settings-link" href="{% url 'settings' %}" title="Settings">&#9881;</a>
             </div>
         </header>
 
@@ -83,6 +88,7 @@
         <footer>
             <form id="runForm" action="{% url 'run_simulation' %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" name="sim_password" id="simPwField">
                 <button id="runBtn" class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
             </form>
         </footer>
@@ -91,13 +97,20 @@
     <script>
         const runForm = document.getElementById('runForm');
         const runBtn = document.getElementById('runBtn');
+        const simPwField = document.getElementById('simPwField');
+        const needPw = {{ sim_password_required|yesno:'true,false' }};
         const hasExam = {{ exam_files|length }} > 0;
         const hasContext = {{ context_files|length }} > 0;
         if (hasExam && hasContext) {
             runBtn.removeAttribute('disabled');
             runBtn.removeAttribute('title');
         }
-        runForm?.addEventListener('submit', () => {
+        runForm?.addEventListener('submit', (e) => {
+            if (needPw && !simPwField.value) {
+                const pw = prompt('Passwort eingeben');
+                if (pw === null) { e.preventDefault(); return; }
+                simPwField.value = pw;
+            }
             runBtn.setAttribute('disabled', '');
             const spinner = document.createElement('span');
             spinner.className = 'spinner';
