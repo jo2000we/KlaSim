@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.management import call_command
 from django.http import HttpResponse
+from django.utils import translation
 import io
 import zipfile
 import openai
@@ -78,6 +79,8 @@ def login_view(request):
 def settings_view(request):
     config = AppConfig.get_solo()
     display_lang = request.GET.get("lang", config.language)
+    translation.activate(display_lang)
+    request.session[translation.LANGUAGE_SESSION_KEY] = display_lang
     prompts = {}
     for ptype in ["system", "base", "level_low", "level_medium", "level_high"]:
         pc = PromptConfig.objects.filter(language=display_lang, prompt_type=ptype).first()
@@ -94,6 +97,8 @@ def settings_view(request):
         if form.is_valid() and prompt_form.is_valid():
             form.save()
             display_lang = form.cleaned_data["language"]
+            translation.activate(display_lang)
+            request.session[translation.LANGUAGE_SESSION_KEY] = display_lang
             for ptype in ["system", "base", "level_low", "level_medium", "level_high"]:
                 pc, _ = PromptConfig.objects.get_or_create(language=display_lang, prompt_type=ptype)
                 use_custom = prompt_form.cleaned_data[f"{ptype}_custom"]
