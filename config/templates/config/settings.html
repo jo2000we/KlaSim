@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Settings</h1>
+        <a class="btn" href="{% url 'logout' %}">Logout</a>
+        <a class="btn" href="{% url 'sessions' %}">Sessions</a>
+    </header>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    <form id="settingsForm" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <fieldset>
+            <legend>Prompts ({{ language }})</legend>
+            <div>
+                {{ prompt_form.system_custom }} System Prompt<br>
+                {{ prompt_form.system_text }}
+            </div>
+            <div>
+                {{ prompt_form.base_custom }} Base Instruction<br>
+                {{ prompt_form.base_text }}
+            </div>
+            <div>
+                {{ prompt_form.level_low_custom }} Level Low<br>
+                {{ prompt_form.level_low_text }}
+            </div>
+            <div>
+                {{ prompt_form.level_medium_custom }} Level Medium<br>
+                {{ prompt_form.level_medium_text }}
+            </div>
+            <div>
+                {{ prompt_form.level_high_custom }} Level High<br>
+                {{ prompt_form.level_high_text }}
+            </div>
+        </fieldset>
+        <p>Key status: <span id="keyStatus">{% if key_valid %}Valid{% else %}Invalid{% endif %}</span></p>
+        <button class="btn main-action" type="submit">Save</button>
+    </form>
+</div>
+<script>
+const form = document.getElementById('settingsForm');
+const keyInput = document.getElementById('id_openai_api_key');
+const statusEl = document.getElementById('keyStatus');
+const langSelect = document.getElementById('id_language');
+
+async function checkKey() {
+    const resp = await fetch('{% url "test_key" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({api_key: keyInput.value})
+    });
+    const data = await resp.json();
+    statusEl.textContent = data.ok ? 'Valid' : 'Invalid';
+    statusEl.style.color = data.ok ? '#b9fbc0' : '#ff6565';
+}
+
+keyInput.addEventListener('input', checkKey);
+checkKey();
+
+if (langSelect) {
+    langSelect.addEventListener('change', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', langSelect.value);
+        window.location.href = url.toString();
+    });
+}
+
+function toggleFields() {
+    const fields = [
+        ['id_system_custom', 'id_system_text'],
+        ['id_base_custom', 'id_base_text'],
+        ['id_level_low_custom', 'id_level_low_text'],
+        ['id_level_medium_custom', 'id_level_medium_text'],
+        ['id_level_high_custom', 'id_level_high_text'],
+    ];
+    for (const [chkId, fieldId] of fields) {
+        const chk = document.getElementById(chkId);
+        const field = document.getElementById(fieldId);
+        if (chk && field) {
+            field.disabled = !chk.checked;
+            chk.addEventListener('change', () => field.disabled = !chk.checked);
+        }
+    }
+}
+
+toggleFields();
+</script>
+</body>
+</html>

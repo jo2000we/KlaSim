@@ -29,6 +29,9 @@ header {
     font-size: 0.97em;
     letter-spacing: 0.01em;
 }
+.session-badge.error {
+    color: #ff6565;
+}
 
 main {
     display: grid;
