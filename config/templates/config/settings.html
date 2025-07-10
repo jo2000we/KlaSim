@@ -10,7 +10,7 @@
 <div class="container">
     <header>
         <h1>Settings</h1>
-        <a class="btn" href="{% url 'logout' %}">Logout</a>
+        <a class="btn" href="{% url 'logout' %}">Close Settings</a>
         <a class="btn" href="{% url 'sessions' %}">Sessions</a>
     </header>
     {% if messages %}
@@ -22,7 +22,30 @@
     {% endif %}
     <form id="settingsForm" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div>
+            <label for="id_openai_api_key">OpenAI API Key</label>
+            <span id="keyStatus" class="state-label">{% if key_valid %}Valid{% else %}Invalid{% endif %}</span><br>
+            {{ form.openai_api_key }}
+            <p class="description">Used to access the OpenAI API.</p>
+        </div>
+        <div>
+            {{ form.language.label_tag }}
+            {{ form.language }}
+        </div>
+        <div>
+            <label for="id_new_password">Set new Settings-Password</label>
+            {{ form.new_password }}
+        </div>
+        <div>
+            <label class="toggle-label" for="simPwToggle">Require Simulation Password</label>
+            <label class="switch">
+                <input type="checkbox" id="simPwToggle" {% if sim_pw_set %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+            <span class="state-label" data-for="simPwToggle"></span><br>
+            {{ form.simulation_password }}
+            <p class="description">Protects against unwanted costs in public networks.</p>
+        </div>
         <fieldset>
             <legend>Prompts ({{ language }})</legend>
             <div>
@@ -56,7 +79,6 @@
                 {{ prompt_form.level_high_text }}
             </div>
         </fieldset>
-        <p>Key status: <span id="keyStatus">{% if key_valid %}Valid{% else %}Invalid{% endif %}</span></p>
         <button class="btn main-action" type="submit">Save</button>
     </form>
 </div>
@@ -111,6 +133,18 @@ function toggleFields() {
             update();
             chk.addEventListener('change', update);
         }
+    }
+
+    const simToggle = document.getElementById('simPwToggle');
+    const simField = document.getElementById('id_simulation_password');
+    const simLabel = document.querySelector('span.state-label[data-for="simPwToggle"]');
+    if (simToggle && simField) {
+        const updateSim = () => {
+            simField.disabled = !simToggle.checked;
+            if (simLabel) simLabel.textContent = simToggle.checked ? 'On' : 'Off';
+        };
+        updateSim();
+        simToggle.addEventListener('change', updateSim);
     }
 }
 
