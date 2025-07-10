@@ -34,11 +34,13 @@ header {
 
 .status-indicator {
     background: #24292f;
-    padding: 6px 16px;
+    padding: 4px 12px;
     border-radius: 18px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     letter-spacing: 0.01em;
     color: #b9fbc0;
+    margin-left: 6px;
+    vertical-align: middle;
 }
 .status-indicator.warn { color: #ffd500; }
 .status-indicator.error { color: #ff6565; }
@@ -49,10 +51,6 @@ header {
     margin-left: 12px;
     text-decoration: none;
     font-size: 1.2em;
-}
-footer .settings-link {
-    margin-left: 0;
-    margin-right: 12px;
 }
 .settings-link:hover { color: #fff; }
 
@@ -83,6 +81,24 @@ main {
 
 form {
     margin-bottom: 16px;
+}
+
+.settings-grid > div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-grid fieldset > div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-grid fieldset > div textarea {
+    grid-column: 1 / span 2;
 }
 
 input[type=text], input[type=password], select, textarea {
@@ -285,6 +301,28 @@ p.error {
 
 footer {
     margin-top: 48px;
-    display: flex;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
     align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: var(--panel-color);
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
 }
