@@ -14,7 +14,18 @@
         <header>
             <h1>Klausur-Simulator</h1>
             <div class="session-badge">
-                <span>&#9679; Aktiv</span>
+                {% if setup_required %}
+                    <a href="{% url 'setup' %}" style="color:#ff0;text-decoration:none;">Setup required</a>
+                {% else %}
+                    <span>&#9679; Aktiv</span>
+                {% endif %}
+            </div>
+            <div class="session-badge{% if not api_key_valid %} error{% endif %}" style="margin-left:10px;">
+                {% if api_key_valid %}
+                    <span>&#9679; Key OK</span>
+                {% else %}
+                    <span>&#9679; Key Fail</span>
+                {% endif %}
             </div>
         </header>
 
@@ -83,6 +94,7 @@
         <footer>
             <form id="runForm" action="{% url 'run_simulation' %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" name="sim_password" id="simPwField">
                 <button id="runBtn" class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
             </form>
         </footer>
@@ -91,13 +103,20 @@
     <script>
         const runForm = document.getElementById('runForm');
         const runBtn = document.getElementById('runBtn');
+        const simPwField = document.getElementById('simPwField');
+        const needPw = {{ sim_password_required|yesno:'true,false' }};
         const hasExam = {{ exam_files|length }} > 0;
         const hasContext = {{ context_files|length }} > 0;
         if (hasExam && hasContext) {
             runBtn.removeAttribute('disabled');
             runBtn.removeAttribute('title');
         }
-        runForm?.addEventListener('submit', () => {
+        runForm?.addEventListener('submit', (e) => {
+            if (needPw && !simPwField.value) {
+                const pw = prompt('Passwort eingeben');
+                if (pw === null) { e.preventDefault(); return; }
+                simPwField.value = pw;
+            }
             runBtn.setAttribute('disabled', '');
             const spinner = document.createElement('span');
             spinner.className = 'spinner';

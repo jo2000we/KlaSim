@@ -9,6 +9,8 @@ from django.conf import settings
 
 from .forms import ContextUploadForm, ExamUploadForm
 from .models import ContextFile, ExamFile, AIResult
+from config.models import AppConfig
+from config.views import _check_openai_key
 from .services import generate_ai_results
 
 
@@ -24,6 +26,7 @@ def _ensure_session_id(request) -> str:
 def index(request):
     """Display upload forms and current session files."""
     session_id = request.session.get("session_id")
+    config = AppConfig.get_solo()
     context_files = (
         ContextFile.objects.filter(session_id=session_id) if session_id else []
     )
@@ -37,9 +40,12 @@ def index(request):
             "exam_form": ExamUploadForm(),
             "context_files": context_files,
             "exam_files": exam_files,
-            "session_id": session_id,
-            "ai_results": ai_results,
-        },
+        "session_id": session_id,
+        "ai_results": ai_results,
+        "setup_required": not config.setup_complete,
+        "api_key_valid": _check_openai_key(config.openai_api_key),
+        "sim_password_required": bool(config.simulation_password_hash),
+    },
     )
 
 
@@ -58,6 +64,7 @@ def upload_context(request):
             ContextFile.objects.filter(session_id=session_id) if session_id else []
         )
         exam_files = ExamFile.objects.filter(session_id=session_id) if session_id else []
+        config = AppConfig.get_solo()
         return render(
             request,
             "simulator/index.html",
@@ -67,6 +74,9 @@ def upload_context(request):
                 "context_files": context_files,
                 "exam_files": exam_files,
                 "session_id": session_id,
+                "setup_required": not config.setup_complete,
+                "api_key_valid": _check_openai_key(config.openai_api_key),
+                "sim_password_required": bool(config.simulation_password_hash),
             },
         )
     return redirect("index")
@@ -88,6 +98,7 @@ def upload_exam(request):
             ContextFile.objects.filter(session_id=session_id) if session_id else []
         )
         exam_files = ExamFile.objects.filter(session_id=session_id) if session_id else []
+        config = AppConfig.get_solo()
         return render(
             request,
             "simulator/index.html",
@@ -97,6 +108,9 @@ def upload_exam(request):
                 "context_files": context_files,
                 "exam_files": exam_files,
                 "session_id": session_id,
+                "setup_required": not config.setup_complete,
+                "api_key_valid": _check_openai_key(config.openai_api_key),
+                "sim_password_required": bool(config.simulation_password_hash),
             },
         )
     return redirect("index")
@@ -123,11 +137,24 @@ def delete_exam(request, pk: int):
 def run_simulation(request):
     """Execute the AI simulation for the current session."""
     session_id = request.session.get("session_id")
+    config = AppConfig.get_solo()
+    if not config.setup_complete:
+        return redirect("setup")
     if not session_id:
         return redirect("index")
 
+    if not _check_openai_key(config.openai_api_key):
+        messages.error(request, "Ungültiger OpenAI API Key")
+        return redirect("index")
+
+    if config.simulation_password_hash:
+        sim_pw = request.POST.get("sim_password", "")
+        if not config.check_simulation_password(sim_pw):
+            messages.error(request, "Falsches Passwort")
+            return redirect("index")
+
     try:
-        generate_ai_results(session_id, api_key=getattr(settings, "OPENAI_API_KEY", None))
+        generate_ai_results(session_id, api_key=config.openai_api_key)
         messages.success(request, "Simulation abgeschlossen.")
     except Exception as exc:  # pragma: no cover - best effort
         messages.error(request, f"Simulation fehlgeschlagen: {exc}")
