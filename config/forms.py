@@ -27,7 +27,10 @@ class LoginForm(forms.Form):
 
 
 class SettingsForm(forms.ModelForm):
-    new_password = forms.CharField(widget=forms.PasswordInput, required=False)
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"style": "display:none;"}),
+        required=False,
+    )
     simulation_password = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta:
