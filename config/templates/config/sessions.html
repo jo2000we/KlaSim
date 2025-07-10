@@ -1,17 +1,17 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sessions</title>
+    <title>{% trans "Sessions" %}</title>
     <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 </head>
 <body>
 <div class="container">
     <header>
-        <h1>Sessions</h1>
-        <a class="btn" href="{% url 'settings' %}">Back</a>
+        <h1>{% trans "Sessions" %}</h1>
+        <a class="btn" href="{% url 'settings' %}">{% trans "Back" %}</a>
     </header>
     {% if messages %}
     <ul class="messages">
@@ -22,27 +22,27 @@
     {% endif %}
     <form method="post" action="{% url 'cleanup_sessions' %}" style="margin-bottom:20px;">
         {% csrf_token %}
-        <button class="btn remove" type="submit" onclick="return confirm('Delete all sessions?');">Delete All Sessions</button>
+        <button class="btn remove" type="submit" onclick="return confirm('{% trans "Delete all sessions?" %}');">{% trans "Delete All Sessions" %}</button>
     </form>
     <ul class="file-list">
     {% for s in sessions %}
         <li>
             <strong>{{ s.id }}</strong>
-            <a class="btn" href="{% url 'download_session_zip' s.id %}">Download ZIP</a>
+            <a class="btn" href="{% url 'download_session_zip' s.id %}">{% trans "Download ZIP" %}</a>
             <ul class="file-list" style="margin-top:10px;">
             {% for f in s.exam %}
-                <li><a href="{{ f.file.url }}" download>Exam</a></li>
+                <li><a href="{{ f.file.url }}" download>{% trans "Exam" %}</a></li>
             {% endfor %}
             {% for f in s.context %}
-                <li><a href="{{ f.file.url }}" download>Context</a></li>
+                <li><a href="{{ f.file.url }}" download>{% trans "Context" %}</a></li>
             {% endfor %}
             {% for r in s.results %}
-                <li><a href="{{ r.file.url }}" download>{{ r.level }} Result</a></li>
+                <li><a href="{{ r.file.url }}" download>{{ r.level }} {% trans "Result" %}</a></li>
             {% endfor %}
             </ul>
         </li>
     {% empty %}
-        <li class="empty">No sessions found.</li>
+        <li class="empty">{% trans "No sessions found." %}</li>
     {% endfor %}
     </ul>
 </div>

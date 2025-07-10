@@ -1,27 +1,27 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Klausur-Simulator</title>
+    <title>{% trans "Exam Simulator" %}</title>
     <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Klausur-Simulator
+            <h1>{% trans "Exam Simulator" %}
                 <span class="status-indicator{% if setup_required %} warn{% elif not api_key_valid %} error{% else %} ok{% endif %}">
                     {% if setup_required %}
-                        <a href="{% url 'setup' %}">Setup</a>
+                        <a href="{% url 'setup' %}">{% trans "Setup" %}</a>
                     {% elif not api_key_valid %}
-                        &#9679; Key Fail
+                        &#9679; {% trans "Key Fail" %}
                     {% else %}
-                        &#9679; Aktiv
+                        &#9679; {% trans "Active" %}
                     {% endif %}
                 </span>
             </h1>
-            <a class="settings-link" href="{% url 'settings' %}" title="Settings">&#9881;</a>
+            <a class="settings-link" href="{% url 'settings' %}" title="{% trans 'Settings' %}">&#9881;</a>
         </header>
 
         {% if messages %}
@@ -34,52 +34,52 @@
 
         <main>
             <section class="file-upload exam">
-                <h2><span class="icon">&#128196;</span> Klausur hochladen</h2>
+                <h2><span class="icon">&#128196;</span> {% trans "Upload Exam" %}</h2>
                 <form action="{% url 'upload_exam' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ exam_form.file }}
                     {{ exam_form.file.errors }}
-                    <button class="btn upload" type="submit">Upload</button>
+                    <button class="btn upload" type="submit">{% trans "Upload" %}</button>
                 </form>
                 <ul class="file-list">
                 {% for f in exam_files %}
                     <li>
                         <span class="filename">{{ f.file.name|cut:"exam_files/" }}</span>
-                        <a class="btn remove" href="{% url 'delete_exam' f.pk %}" aria-label="Klausur entfernen">&#10006;</a>
+                        <a class="btn remove" href="{% url 'delete_exam' f.pk %}" aria-label="{% trans 'Remove exam' %}">&#10006;</a>
                     </li>
                 {% empty %}
-                    <li class="empty">Keine Klausur hochgeladen.</li>
+                    <li class="empty">{% trans "No exam uploaded." %}</li>
                 {% endfor %}
                 </ul>
             </section>
 
             <section class="file-upload context">
-                <h2><span class="icon">&#128206;</span> Kontextdatei hochladen</h2>
+                <h2><span class="icon">&#128206;</span> {% trans "Upload Context" %}</h2>
                 <form action="{% url 'upload_context' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ context_form.file }}
                     {{ context_form.file.errors }}
-                    <button class="btn upload" type="submit">Upload</button>
+                    <button class="btn upload" type="submit">{% trans "Upload" %}</button>
                 </form>
                 <ul class="file-list">
                 {% for f in context_files %}
                     <li>
                         <span class="filename">{{ f.file.name|cut:"context_files/" }}</span>
-                        <a class="btn remove" href="{% url 'delete_context' f.pk %}" aria-label="Kontext entfernen">&#10006;</a>
+                        <a class="btn remove" href="{% url 'delete_context' f.pk %}" aria-label="{% trans 'Remove context' %}">&#10006;</a>
                     </li>
                 {% empty %}
-                    <li class="empty">Keine Kontextdateien hochgeladen.</li>
+                    <li class="empty">{% trans "No context files uploaded." %}</li>
                 {% endfor %}
                 </ul>
             </section>
 
             {% if ai_results %}
             <section class="ai-results">
-                <h2><span class="icon">&#128196;</span> Ergebnisse</h2>
+                <h2><span class="icon">&#128196;</span> {% trans "Results" %}</h2>
                 <ul class="file-list">
                 {% for r in ai_results %}
                     <li>
-                        <a href="{{ r.file.url }}" download>{{ r.level }} Ergebnis</a>
+                        <a href="{{ r.file.url }}" download>{{ r.level }} {% trans "Result" %}</a>
                     </li>
                 {% endfor %}
                 </ul>
@@ -90,7 +90,7 @@
             <form id="runForm" action="{% url 'run_simulation' %}" method="post" style="width:100%;">
                 {% csrf_token %}
                 <input type="hidden" name="sim_password" id="simPwField">
-                <button id="runBtn" class="btn main-action" disabled title="Erst Dateien hochladen">KI-Simulation starten</button>
+                <button id="runBtn" class="btn main-action" disabled title="{% trans 'Upload files first' %}">{% trans 'Start AI simulation' %}</button>
             </form>
         </footer>
     </div>
@@ -102,13 +102,14 @@
         const needPw = {{ sim_password_required|yesno:'true,false' }};
         const hasExam = {{ exam_files|length }} > 0;
         const hasContext = {{ context_files|length }} > 0;
+        const TXT_ENTER_PW = "{{ _('Enter password') }}";
         if (hasExam && hasContext) {
             runBtn.removeAttribute('disabled');
             runBtn.removeAttribute('title');
         }
         runForm?.addEventListener('submit', (e) => {
             if (needPw && !simPwField.value) {
-                const pw = prompt('Passwort eingeben');
+                const pw = prompt(TXT_ENTER_PW);
                 if (pw === null) { e.preventDefault(); return; }
                 simPwField.value = pw;
             }
