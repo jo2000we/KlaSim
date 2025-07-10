@@ -116,6 +116,7 @@ def settings_view(request):
         "prompt_form": prompt_form,
         "key_valid": key_valid,
         "language": display_lang,
+        "sim_pw_set": bool(config.simulation_password_hash),
     }
     return render(request, "config/settings.html", context)
 

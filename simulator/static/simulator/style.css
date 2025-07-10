@@ -16,7 +16,6 @@ body {
 
 header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 22px;
 }
@@ -28,6 +27,7 @@ header {
     font-size: 0.97em;
     letter-spacing: 0.01em;
     color: #b9fbc0;
+    margin-left: auto;
 }
 .status-indicator.warn { color: #ffd500; }
 .status-indicator.error { color: #ff6565; }
@@ -38,6 +38,10 @@ header {
     margin-left: 12px;
     text-decoration: none;
     font-size: 1.2em;
+}
+footer .settings-link {
+    margin-left: 0;
+    margin-right: 12px;
 }
 .settings-link:hover { color: #fff; }
 
@@ -123,6 +127,12 @@ textarea {
     margin-right: 6px;
     font-size: 0.9em;
     opacity: 0.8;
+}
+.description {
+    font-size: 0.85em;
+    opacity: 0.75;
+    margin-top: -6px;
+    margin-bottom: 12px;
 }
 
 .file-list {
@@ -222,4 +232,6 @@ textarea {
 
 footer {
     margin-top: 48px;
+    display: flex;
+    align-items: center;
 }
