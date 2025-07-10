@@ -33,7 +33,7 @@
             {{ form.language.label_tag }}
             {{ form.language }}
         </div>
-        <div>
+        <div class="single">
             <button type="button" id="newPwBtn" class="btn">Set new Settings-Password</button>
             {{ form.new_password }}
         </div>
@@ -82,7 +82,6 @@
                 {{ prompt_form.level_high_text }}
             </div>
         </fieldset>
-        <button class="btn main-action" type="submit">Save</button>
     </form>
 </div>
 
@@ -193,8 +192,16 @@ if (newPwBtn && pwModal) {
         }
         hiddenNewPw.value = pw1.value;
         pwModal.style.display = 'none';
+        form.requestSubmit();
     });
 }
+
+document.querySelectorAll('#settingsForm input, #settingsForm select, #settingsForm textarea')
+    .forEach(el => {
+        el.addEventListener('change', () => {
+            form.requestSubmit();
+        });
+    });
 </script>
 </body>
 </html>
