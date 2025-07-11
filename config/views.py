@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib import messages
+from django.conf import settings
 from django.core.management import call_command
 from django.http import HttpResponse
 import io
@@ -110,7 +111,9 @@ def settings_view(request):
                     pc.is_custom = False
                 pc.save()
             messages.success(request, "Settings saved")
-            return redirect(f"{reverse('settings')}?lang={display_lang}")
+            resp = redirect(f"{reverse('settings')}?lang={display_lang}")
+            resp.set_cookie(settings.LANGUAGE_COOKIE_NAME, display_lang)
+            return resp
     else:
         form = SettingsForm(instance=config, initial={"language": display_lang})
         prompt_form = PromptForm(initial=prompts)
@@ -123,7 +126,9 @@ def settings_view(request):
         "language": display_lang,
         "sim_pw_set": bool(config.simulation_password_hash),
     }
-    return render(request, "config/settings.html", context)
+    resp = render(request, "config/settings.html", context)
+    resp.set_cookie(settings.LANGUAGE_COOKIE_NAME, display_lang)
+    return resp
 
 
 def logout_view(request):
