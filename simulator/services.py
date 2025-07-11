@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import csv
+import json
 from pathlib import Path
 from typing import List
 
@@ -83,6 +84,65 @@ def assemble_prompt(session_id: str) -> str:
     return prompt
 
 
+def _insert_answers_ai(
+    doc: Document,
+    answer: str,
+    level: str,
+    color: RGBColor,
+    client: openai.OpenAI,
+    model: str,
+) -> bool:
+    """Use the AI to find insertion spots for an answer within a document.
+
+    The AI receives the numbered exam paragraphs and the student's complete
+    answer. It returns JSON objects with the paragraph index after which each
+    answer segment should be inserted. The function inserts these segments and
+    returns ``True`` if at least one insertion was made."""
+
+    numbered = "\n".join(f"{i}: {p.text}" for i, p in enumerate(doc.paragraphs))
+    system_msg = (
+        "You receive an exam with numbered paragraphs and a student's answer."
+        " Decide after which paragraphs the answer segments belong and return a"
+        " JSON list of objects with keys 'after' (paragraph number) and 'text'"
+        " (exact answer text). Do not change wording or language."
+    )
+    user_msg = (
+        f"Exam paragraphs:\n{numbered}\n\nStudent answer:\n{answer}\n\n"
+        "Return only the JSON list."
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "system", "content": system_msg}, {"role": "user", "content": user_msg}],
+            temperature=0,
+        )
+        instructions = json.loads(resp.choices[0].message.content)
+    except Exception:
+        return False
+
+    if not isinstance(instructions, list):
+        return False
+
+    made_change = False
+    for ins in sorted(instructions, key=lambda x: x.get("after", -1), reverse=True):
+        try:
+            idx = int(ins.get("after"))
+            text = str(ins.get("text", "")).strip()
+        except Exception:
+            continue
+        if not text or idx < 0 or idx >= len(doc.paragraphs):
+            continue
+        para = doc.paragraphs[idx]
+        head = _insert_paragraph_after(para, f"{level.title()} Antwort:", style="Heading2")
+        ans_p = _insert_paragraph_after(head, "")
+        run = ans_p.add_run(text)
+        run.font.color.rgb = color
+        made_change = True
+
+    return made_change
+
+
 def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[AIResult]:
     """Generate AI answers for all performance levels."""
     base_prompt = assemble_prompt(session_id)
@@ -140,6 +200,17 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
                 run = ans_p.add_run(answer)
                 run.font.color.rgb = color_map[level]
                 inserted = True
+
+        if not inserted:
+            inserted = _insert_answers_ai(
+                doc,
+                answer,
+                level,
+                color_map[level],
+                client,
+                model,
+            )
+
         if not inserted:
             # Add heading with graceful fallback if the "Heading 2" style is
             # missing in the template
