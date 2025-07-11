@@ -12,7 +12,30 @@ from django.core.files.base import File
 
 import openai
 from docx import Document
+from docx.shared import RGBColor
+from docx.text.paragraph import Paragraph
+from docx.oxml import OxmlElement
 from PyPDF2 import PdfReader
+
+
+def _insert_paragraph_after(paragraph: Paragraph, text: str = "", style: str | None = None) -> Paragraph:
+    """Insert a new paragraph after the given one and return it.
+
+    If a style is provided but not found in the document, the paragraph will be
+    added using the document's default style instead of raising ``KeyError``.
+    """
+    new_p = OxmlElement("w:p")
+    paragraph._p.addnext(new_p)
+    new_para = Paragraph(new_p, paragraph._parent)
+    if text:
+        new_para.add_run(text)
+    if style:
+        try:
+            new_para.style = style
+        except KeyError:
+            # Fall back to default style if the requested style is not present
+            pass
+    return new_para
 
 from .models import AIResult, ContextFile, ExamFile
 from config.utils import load_prompts
@@ -72,6 +95,11 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
         old.file.delete(save=False)
         old.delete()
 
+    # Get the uploaded exam document to use as template
+    exam = ExamFile.objects.filter(session_id=session_id).first()
+    if not exam:
+        raise ValueError("No exam file uploaded")
+
     prompts = load_prompts()
     results: List[AIResult] = []
     level_map = {
@@ -79,6 +107,12 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
         "medium": prompts["level_medium"],
         "high": prompts["level_high"],
     }
+    color_map = {
+        "low": RGBColor(0x80, 0x00, 0x00),
+        "medium": RGBColor(0x00, 0x64, 0x00),
+        "high": RGBColor(0x00, 0x00, 0x80),
+    }
+
     for level, instruction in level_map.items():
         messages = [
             {"role": "system", "content": prompts["system"]},
@@ -91,9 +125,36 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
         response = client.chat.completions.create(model=model, messages=messages)
         answer = response.choices[0].message.content.strip()
 
-        doc = Document()
-        doc.add_paragraph(answer)
-        file_name = f"{level}.docx"
+        # Load exam document fresh for each level
+        doc = Document(exam.file.path)
+        inserted = False
+        for para in doc.paragraphs:
+            if "[Antwort]" in para.text:
+                para.text = para.text.replace("[Antwort]", "").rstrip()
+                head = _insert_paragraph_after(
+                    para, f"{level.title()} Antwort:", style="Heading2"
+                )
+                ans_p = _insert_paragraph_after(head, "")
+                run = ans_p.add_run(answer)
+                run.font.color.rgb = color_map[level]
+                inserted = True
+        if not inserted:
+            # Add heading with graceful fallback if the "Heading 2" style is
+            # missing in the template
+            try:
+                head = doc.add_heading(f"{level.title()} Antwort:", level=2)
+            except KeyError:
+                head = doc.add_paragraph(f"{level.title()} Antwort:")
+                try:
+                    head.style = "Heading2"
+                except KeyError:
+                    pass
+            p = doc.add_paragraph()
+            run = p.add_run(answer)
+            run.font.color.rgb = color_map[level]
+
+        orig_name = Path(exam.file.name).stem
+        file_name = f"{orig_name}_{level}.docx"
         file_path = session_dir / file_name
         doc.save(file_path)
 
