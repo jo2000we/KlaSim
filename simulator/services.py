@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import csv
 import json
+import re
 from pathlib import Path
 from typing import List
 
@@ -117,7 +118,17 @@ def _insert_answers_ai(
             messages=[{"role": "system", "content": system_msg}, {"role": "user", "content": user_msg}],
             temperature=0,
         )
-        instructions = json.loads(resp.choices[0].message.content)
+        content = resp.choices[0].message.content
+    except Exception:
+        return False
+
+    # extract JSON list from the response which might contain additional text
+    match = re.search(r"\[[^\]]*\]", content, re.S)
+    if not match:
+        return False
+
+    try:
+        instructions = json.loads(match.group(0))
     except Exception:
         return False
 
@@ -131,8 +142,13 @@ def _insert_answers_ai(
             text = str(ins.get("text", "")).strip()
         except Exception:
             continue
+
+        if idx > 0 and idx <= len(doc.paragraphs):
+            idx -= 1  # treat response as 1-based index
+
         if not text or idx < 0 or idx >= len(doc.paragraphs):
             continue
+
         para = doc.paragraphs[idx]
         head = _insert_paragraph_after(para, f"{level.title()} Antwort:", style="Heading2")
         ans_p = _insert_paragraph_after(head, "")
