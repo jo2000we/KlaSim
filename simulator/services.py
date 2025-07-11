@@ -19,14 +19,22 @@ from PyPDF2 import PdfReader
 
 
 def _insert_paragraph_after(paragraph: Paragraph, text: str = "", style: str | None = None) -> Paragraph:
-    """Insert a new paragraph after the given one and return it."""
+    """Insert a new paragraph after the given one and return it.
+
+    If a style is provided but not found in the document, the paragraph will be
+    added using the document's default style instead of raising ``KeyError``.
+    """
     new_p = OxmlElement("w:p")
     paragraph._p.addnext(new_p)
     new_para = Paragraph(new_p, paragraph._parent)
     if text:
         new_para.add_run(text)
     if style:
-        new_para.style = style
+        try:
+            new_para.style = style
+        except KeyError:
+            # Fall back to default style if the requested style is not present
+            pass
     return new_para
 
 from .models import AIResult, ContextFile, ExamFile
@@ -131,7 +139,16 @@ def generate_ai_results(session_id: str, *, api_key: str | None = None) -> List[
                 run.font.color.rgb = color_map[level]
                 inserted = True
         if not inserted:
-            doc.add_heading(f"{level.title()} Antwort:", level=2)
+            # Add heading with graceful fallback if the "Heading 2" style is
+            # missing in the template
+            try:
+                head = doc.add_heading(f"{level.title()} Antwort:", level=2)
+            except KeyError:
+                head = doc.add_paragraph(f"{level.title()} Antwort:")
+                try:
+                    head.style = "Heading2"
+                except KeyError:
+                    pass
             p = doc.add_paragraph()
             run = p.add_run(answer)
             run.font.color.rgb = color_map[level]
