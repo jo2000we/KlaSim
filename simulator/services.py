@@ -18,6 +18,7 @@ from docx.oxml import OxmlElement
 from PyPDF2 import PdfReader
 
 
+
 def _insert_paragraph_after(paragraph: Paragraph, text: str = "", style: str | None = None) -> Paragraph:
     """Insert a new paragraph after the given one and return it.
 
@@ -36,6 +37,7 @@ def _insert_paragraph_after(paragraph: Paragraph, text: str = "", style: str | N
             # Fall back to default style if the requested style is not present
             pass
     return new_para
+
 
 from .models import AIResult, ContextFile, ExamFile
 from config.utils import load_prompts
